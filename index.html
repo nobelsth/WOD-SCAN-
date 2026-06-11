@@ -1,1083 +1,466 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>WodScan — CrossFit · Hyrox · Partage & Performance</title>
-<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+<title>WodScan — Scan your WOD. Own your performance.</title>
+<meta name="description" content="WodScan uses AI to analyze CrossFit and Hyrox WODs instantly. Track records, compete on the leaderboard, build your community.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --red: #FF2D2D;
-    --black: #0a0a0a;
-    --dark: #111111;
-    --card: #1a1a1a;
-    --border: #2a2a2a;
-    --white: #ffffff;
-    --muted: #666666;
-    --yellow: #FFE600;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  html { scroll-behavior: smooth; }
-
-  body {
-    background: var(--black);
-    color: var(--white);
-    font-family: 'Barlow', sans-serif;
-    overflow-x: hidden;
-  }
-
-  /* NAV */
-  nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    z-index: 100;
-    padding: 16px 40px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: rgba(10,10,10,0.92);
-    backdrop-filter: blur(12px);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .nav-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    letter-spacing: 2px;
-    color: var(--white);
-  }
-
-  .nav-logo span { color: var(--red); }
-
-  .nav-links {
-    display: flex;
-    gap: 32px;
-    list-style: none;
-  }
-
-  .nav-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-weight: 600;
-    font-size: 14px;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    transition: color 0.2s;
-  }
-
-  .nav-links a:hover { color: var(--white); }
-
-  .nav-cta {
-    background: var(--red);
-    color: var(--white) !important;
-    padding: 10px 22px;
-    border-radius: 8px;
-    font-weight: 700 !important;
-  }
-
-  .nav-cta:hover { background: #e02020 !important; }
-
-  /* HERO */
-  .hero {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    position: relative;
-    overflow: hidden;
-    padding: 120px 40px 80px;
-  }
-
-  .hero-bg {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 80% 60% at 60% 40%, rgba(255,45,45,0.08) 0%, transparent 70%),
-      repeating-linear-gradient(0deg, transparent, transparent 80px, rgba(255,255,255,0.015) 80px, rgba(255,255,255,0.015) 81px),
-      repeating-linear-gradient(90deg, transparent, transparent 80px, rgba(255,255,255,0.015) 80px, rgba(255,255,255,0.015) 81px);
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    max-width: 1200px;
-    margin: 0 auto;
-    width: 100%;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 80px;
-    align-items: center;
-  }
-
-  .hero-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    background: rgba(255,45,45,0.12);
-    border: 1px solid rgba(255,45,45,0.3);
-    border-radius: 100px;
-    padding: 6px 16px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--red);
-    margin-bottom: 24px;
-  }
-
-  .hero-tag::before {
-    content: '';
-    width: 6px; height: 6px;
-    border-radius: 50%;
-    background: var(--red);
-    animation: pulse 2s infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.5; transform: scale(1.4); }
-  }
-
-  .hero-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(72px, 8vw, 120px);
-    line-height: 0.9;
-    letter-spacing: 2px;
-    margin-bottom: 8px;
-  }
-
-  .hero-title .red { color: var(--red); }
-
-  .hero-subtitle {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 32px;
-  }
-
-  .hero-desc {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #aaa;
-    margin-bottom: 40px;
-    max-width: 480px;
-  }
-
-  .hero-btns {
-    display: flex;
-    gap: 16px;
-    flex-wrap: wrap;
-  }
-
-  .btn-primary {
-    background: var(--red);
-    color: var(--white);
-    padding: 16px 32px;
-    border-radius: 10px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-decoration: none;
-    text-transform: uppercase;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: all 0.2s;
-  }
-
-  .btn-primary:hover {
-    background: #e02020;
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(255,45,45,0.3);
-  }
-
-  .btn-secondary {
-    border: 1.5px solid var(--border);
-    color: var(--white);
-    padding: 16px 32px;
-    border-radius: 10px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-decoration: none;
-    text-transform: uppercase;
-    transition: all 0.2s;
-  }
-
-  .btn-secondary:hover {
-    border-color: var(--white);
-    transform: translateY(-2px);
-  }
-
-  .hero-stats {
-    display: flex;
-    gap: 32px;
-    margin-top: 48px;
-  }
-
-  .stat {
-    display: flex;
-    flex-direction: column;
-  }
-
-  .stat-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 42px;
-    color: var(--white);
-    line-height: 1;
-  }
-
-  .stat-number span { color: var(--red); }
-
-  .stat-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* PHONE MOCKUP */
-  .hero-phone {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    position: relative;
-  }
-
-  .phone-glow {
-    position: absolute;
-    width: 300px; height: 300px;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255,45,45,0.2) 0%, transparent 70%);
-    animation: glow-pulse 3s ease-in-out infinite;
-  }
-
-  @keyframes glow-pulse {
-    0%, 100% { transform: scale(1); opacity: 0.6; }
-    50% { transform: scale(1.2); opacity: 1; }
-  }
-
-  .phone-frame {
-    position: relative;
-    width: 260px;
-    height: 520px;
-    background: var(--dark);
-    border-radius: 40px;
-    border: 2px solid #2a2a2a;
-    overflow: hidden;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05);
-  }
-
-  .phone-notch {
-    position: absolute;
-    top: 12px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 80px; height: 20px;
-    background: var(--black);
-    border-radius: 100px;
-    z-index: 10;
-  }
-
-  .phone-screen {
-    padding: 52px 16px 16px;
-    height: 100%;
-    background: var(--dark);
-  }
-
-  .phone-header {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 22px;
-    letter-spacing: 1px;
-    margin-bottom: 12px;
-  }
-
-  .phone-header span { color: var(--red); }
-
-  .phone-card {
-    background: var(--card);
-    border-radius: 12px;
-    border: 1px solid var(--border);
-    padding: 12px;
-    margin-bottom: 8px;
-  }
-
-  .phone-scan-btn {
-    background: var(--red);
-    border-radius: 10px;
-    padding: 12px;
-    text-align: center;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    margin-bottom: 8px;
-  }
-
-  .phone-type {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 4px;
-  }
-
-  .phone-result {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 28px;
-    color: var(--red);
-  }
-
-  .phone-tabbar {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 56px;
-    background: var(--dark);
-    border-top: 1px solid var(--border);
-    display: flex;
-    align-items: center;
-    justify-content: space-around;
-    padding: 0 8px;
-  }
-
-  .tab-icon {
-    font-size: 18px;
-    opacity: 0.4;
-  }
-
-  .tab-icon.active { opacity: 1; }
-
-  /* FEATURES */
-  .section {
-    padding: 100px 40px;
-    max-width: 1200px;
-    margin: 0 auto;
-  }
-
-  .section-tag {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--red);
-    margin-bottom: 16px;
-  }
-
-  .section-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(42px, 5vw, 72px);
-    line-height: 1;
-    letter-spacing: 2px;
-    margin-bottom: 16px;
-  }
-
-  .section-title span { color: var(--red); }
-
-  .section-desc {
-    font-size: 16px;
-    line-height: 1.7;
-    color: #888;
-    max-width: 560px;
-    margin-bottom: 60px;
-  }
-
-  .features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-  }
-
-  .feature-card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 16px;
-    padding: 28px;
-    transition: all 0.3s;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .feature-card::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0;
-    height: 2px;
-    background: var(--red);
-    transform: scaleX(0);
-    transition: transform 0.3s;
-  }
-
-  .feature-card:hover {
-    border-color: #3a3a3a;
-    transform: translateY(-4px);
-  }
-
-  .feature-card:hover::before { transform: scaleX(1); }
-
-  .feature-icon {
-    font-size: 36px;
-    margin-bottom: 16px;
-    display: block;
-  }
-
-  .feature-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 20px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
-
-  .feature-desc {
-    font-size: 14px;
-    line-height: 1.6;
-    color: var(--muted);
-  }
-
-  /* HOW IT WORKS */
-  .how-section {
-    background: var(--dark);
-    padding: 100px 40px;
-    border-top: 1px solid var(--border);
-    border-bottom: 1px solid var(--border);
-  }
-
-  .steps {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 40px;
-    margin-top: 60px;
-  }
-
-  .step {
-    text-align: center;
-    position: relative;
-  }
-
-  .step:not(:last-child)::after {
-    content: '→';
-    position: absolute;
-    top: 28px;
-    right: -20px;
-    color: var(--red);
-    font-size: 20px;
-    font-weight: bold;
-  }
-
-  .step-number {
-    width: 56px; height: 56px;
-    border-radius: 50%;
-    border: 2px solid var(--red);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 24px;
-    color: var(--red);
-    margin: 0 auto 16px;
-  }
-
-  .step-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 18px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 8px;
-  }
-
-  .step-desc {
-    font-size: 13px;
-    line-height: 1.6;
-    color: var(--muted);
-  }
-
-  /* PRICING */
-  .pricing-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 24px;
-    max-width: 700px;
-    margin: 0 auto;
-  }
-
-  .price-card {
-    background: var(--card);
-    border: 1.5px solid var(--border);
-    border-radius: 20px;
-    padding: 36px 28px;
-    position: relative;
-    text-align: center;
-    transition: all 0.3s;
-  }
-
-  .price-card:hover { transform: translateY(-4px); }
-
-  .price-card.featured {
-    border-color: var(--red);
-    background: rgba(255,45,45,0.06);
-  }
-
-  .price-badge {
-    position: absolute;
-    top: -12px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: var(--red);
-    color: var(--white);
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 800;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    padding: 4px 16px;
-    border-radius: 100px;
-  }
-
-  .price-name {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--muted);
-    margin-bottom: 12px;
-  }
-
-  .price-amount {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 64px;
-    line-height: 1;
-    color: var(--white);
-    margin-bottom: 4px;
-  }
-
-  .price-amount span {
-    font-size: 28px;
-    color: var(--muted);
-  }
-
-  .price-period {
-    font-size: 13px;
-    color: var(--muted);
-    margin-bottom: 8px;
-  }
-
-  .price-saving {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--yellow);
-    margin-bottom: 24px;
-  }
-
-  .price-trial {
-    font-size: 13px;
-    color: #888;
-    margin-bottom: 24px;
-  }
-
-  .price-cta {
-    display: block;
-    background: var(--red);
-    color: var(--white);
-    padding: 14px;
-    border-radius: 10px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-decoration: none;
-    transition: all 0.2s;
-  }
-
-  .price-cta:hover { background: #e02020; }
-
-  .price-cta.outline {
-    background: transparent;
-    border: 1.5px solid var(--border);
-  }
-
-  .price-cta.outline:hover { border-color: var(--white); background: transparent; }
-
-  .pricing-note {
-    text-align: center;
-    margin-top: 24px;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  /* COMMUNITY */
-  .community-section {
-    background: var(--red);
-    padding: 80px 40px;
-    text-align: center;
-  }
-
-  .community-title {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(42px, 5vw, 72px);
-    letter-spacing: 2px;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-
-  .community-desc {
-    font-size: 16px;
-    color: rgba(255,255,255,0.75);
-    max-width: 560px;
-    margin: 0 auto 40px;
-    line-height: 1.7;
-  }
-
-  .community-stats {
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    margin-bottom: 40px;
-  }
-
-  .community-stat-number {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 52px;
-    color: var(--white);
-    line-height: 1;
-  }
-
-  .community-stat-label {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 13px;
-    font-weight: 600;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.6);
-    margin-top: 4px;
-  }
-
-  .btn-white {
-    background: var(--white);
-    color: var(--red);
-    padding: 16px 40px;
-    border-radius: 10px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 16px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    text-transform: uppercase;
-    text-decoration: none;
-    display: inline-block;
-    transition: all 0.2s;
-  }
-
-  .btn-white:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-  }
-
-  /* FOOTER */
-  footer {
-    background: var(--dark);
-    border-top: 1px solid var(--border);
-    padding: 60px 40px 30px;
-  }
-
-  .footer-grid {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 2fr 1fr 1fr 1fr;
-    gap: 60px;
-    margin-bottom: 40px;
-  }
-
-  .footer-logo {
-    font-family: 'Bebas Neue', sans-serif;
-    font-size: 32px;
-    letter-spacing: 2px;
-    margin-bottom: 12px;
-  }
-
-  .footer-logo span { color: var(--red); }
-
-  .footer-desc {
-    font-size: 14px;
-    color: var(--muted);
-    line-height: 1.7;
-    margin-bottom: 20px;
-  }
-
-  .footer-disciplines {
-    display: flex;
-    gap: 8px;
-  }
-
-  .discipline-tag {
-    background: rgba(255,45,45,0.12);
-    border: 1px solid rgba(255,45,45,0.3);
-    border-radius: 6px;
-    padding: 4px 12px;
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    color: var(--red);
-  }
-
-  .footer-col-title {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 12px;
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--white);
-    margin-bottom: 16px;
-  }
-
-  .footer-links {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .footer-links a {
-    color: var(--muted);
-    text-decoration: none;
-    font-size: 14px;
-    transition: color 0.2s;
-  }
-
-  .footer-links a:hover { color: var(--white); }
-
-  .footer-bottom {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 13px;
-    color: var(--muted);
-  }
-
-  /* ANIMATIONS */
-  .fade-in {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-
-  .fade-in.visible {
-    opacity: 1;
-    transform: translateY(0);
-  }
-
-  /* MOBILE */
-  @media (max-width: 768px) {
-    nav { padding: 14px 20px; }
-    .nav-links { display: none; }
-    .hero { padding: 100px 20px 60px; }
-    .hero-content { grid-template-columns: 1fr; gap: 40px; }
-    .hero-phone { order: -1; }
-    .phone-frame { width: 200px; height: 400px; }
-    .features-grid { grid-template-columns: 1fr; }
-    .steps { grid-template-columns: repeat(2, 1fr); }
-    .step:nth-child(2)::after, .step:nth-child(4)::after { display: none; }
-    .pricing-grid { grid-template-columns: 1fr; max-width: 340px; }
-    .community-stats { gap: 30px; }
-    .footer-grid { grid-template-columns: 1fr; gap: 32px; }
-    .footer-bottom { flex-direction: column; gap: 8px; text-align: center; }
-    .section { padding: 60px 20px; }
-    .how-section { padding: 60px 20px; }
-  }
+:root {
+  --red: #FF2D2D;
+  --red2: #ff5050;
+  --black: #060606;
+  --card: #0f0f0f;
+  --card2: #141414;
+  --border: #1c1c1c;
+  --muted: #4a4a4a;
+  --text: #d8d8d8;
+  --white: #ffffff;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--text);font-family:'Inter',sans-serif;overflow-x:hidden}
+
+/* ── NAV ── */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:0 48px;height:64px;display:flex;align-items:center;justify-content:space-between;background:rgba(6,6,6,0.85);backdrop-filter:blur(20px);border-bottom:1px solid var(--border)}
+.nav-logo{font-family:'Bebas Neue',sans-serif;font-size:26px;letter-spacing:3px;color:var(--white);text-decoration:none}
+.nav-logo em{color:var(--red);font-style:normal}
+.nav-center{display:flex;gap:36px}
+.nav-center a{color:var(--muted);text-decoration:none;font-size:13px;font-weight:500;letter-spacing:.3px;transition:color .2s}
+.nav-center a:hover{color:var(--white)}
+.nav-right{display:flex;align-items:center;gap:16px}
+.nav-pill{border:1px solid var(--border);color:var(--muted);padding:8px 18px;border-radius:100px;font-size:12px;font-weight:600;text-decoration:none;transition:all .2s}
+.nav-pill:hover{border-color:var(--muted);color:var(--white)}
+.nav-btn{background:var(--red);color:#fff;padding:9px 20px;border-radius:100px;font-size:13px;font-weight:700;text-decoration:none;transition:opacity .2s}
+.nav-btn:hover{opacity:.85}
+
+/* ── HERO ── */
+.hero{min-height:100vh;display:grid;place-items:center;text-align:center;padding:100px 24px 60px;position:relative;overflow:hidden}
+.hero-noise{position:absolute;inset:0;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");pointer-events:none;z-index:0}
+.hero-glow1{position:absolute;top:-200px;left:50%;transform:translateX(-50%);width:900px;height:700px;background:radial-gradient(ellipse,rgba(255,45,45,.07) 0%,transparent 65%);pointer-events:none;z-index:0}
+.hero-glow2{position:absolute;bottom:-100px;left:20%;width:500px;height:400px;background:radial-gradient(ellipse,rgba(255,45,45,.04) 0%,transparent 70%);pointer-events:none;z-index:0}
+.hero-inner{position:relative;z-index:1;max-width:900px}
+.hero-eyebrow{display:inline-flex;align-items:center;gap:10px;border:1px solid rgba(255,45,45,.25);background:rgba(255,45,45,.06);border-radius:100px;padding:7px 18px;font-size:11px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:40px}
+.hero-eyebrow-dot{width:6px;height:6px;border-radius:50%;background:var(--red);animation:blink 1.8s infinite}
+@keyframes blink{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(255,45,45,.4)}50%{opacity:.5;box-shadow:0 0 0 6px transparent}}
+.hero-h1{font-family:'Bebas Neue',sans-serif;font-size:clamp(80px,14vw,180px);line-height:.88;letter-spacing:-2px;color:var(--white);margin-bottom:32px}
+.hero-h1 .red{color:var(--red)}
+.hero-h1 .outline{-webkit-text-stroke:2px rgba(255,255,255,.15);color:transparent}
+.hero-p{font-size:clamp(16px,2vw,19px);color:var(--muted);line-height:1.7;max-width:500px;margin:0 auto 52px}
+.hero-p strong{color:var(--text)}
+.hero-ctas{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:80px}
+.cta-main{background:var(--red);color:#fff;padding:18px 36px;border-radius:100px;font-size:15px;font-weight:800;text-decoration:none;letter-spacing:.3px;display:flex;align-items:center;gap:10px;transition:transform .2s,opacity .2s;box-shadow:0 0 40px rgba(255,45,45,.25)}
+.cta-main:hover{transform:translateY(-2px);opacity:.9}
+.cta-ghost{border:1px solid var(--border);color:var(--text);padding:18px 36px;border-radius:100px;font-size:15px;font-weight:600;text-decoration:none;transition:border-color .2s,transform .2s}
+.cta-ghost:hover{border-color:var(--muted);transform:translateY(-2px)}
+.hero-meta{display:flex;gap:40px;justify-content:center;flex-wrap:wrap}
+.hero-meta-item{text-align:center}
+.hero-meta-num{font-family:'Bebas Neue',sans-serif;font-size:36px;color:var(--white);line-height:1}
+.hero-meta-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+
+/* ── TICKER ── */
+.ticker{overflow:hidden;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:16px 0;background:var(--card)}
+.ticker-track{display:flex;white-space:nowrap;animation:scroll 25s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-item{display:inline-flex;align-items:center;gap:20px;padding:0 32px;font-size:12px;font-weight:700;color:var(--muted);letter-spacing:3px;text-transform:uppercase}
+.ticker-sep{color:var(--red);font-size:6px}
+@keyframes scroll{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── SECTION BASE ── */
+.section{padding:120px 48px;max-width:1200px;margin:0 auto}
+.eyebrow{font-size:11px;font-weight:700;color:var(--red);letter-spacing:4px;text-transform:uppercase;margin-bottom:18px}
+.big-title{font-family:'Bebas Neue',sans-serif;font-size:clamp(48px,7vw,88px);color:var(--white);line-height:.95;margin-bottom:24px}
+.big-title em{color:var(--red);font-style:normal}
+.body-text{font-size:17px;color:var(--muted);line-height:1.75;max-width:520px}
+
+/* ── HOW ── */
+.how-wrap{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.how-inner{max-width:1200px;margin:0 auto;padding:120px 48px}
+.how-steps{display:grid;grid-template-columns:repeat(3,1fr);gap:1px;background:var(--border);border-radius:16px;overflow:hidden;margin-top:72px}
+.how-step{background:var(--black);padding:52px 40px;position:relative;transition:background .3s}
+.how-step:hover{background:var(--card2)}
+.step-icon-wrap{width:56px;height:56px;border-radius:12px;background:rgba(255,45,45,.1);border:1px solid rgba(255,45,45,.2);display:flex;align-items:center;justify-content:center;font-size:24px;margin-bottom:28px}
+.step-n{font-family:'Bebas Neue',sans-serif;font-size:80px;color:var(--red);opacity:.08;position:absolute;top:24px;right:28px;line-height:1}
+.step-title{font-size:20px;font-weight:800;color:var(--white);margin-bottom:12px}
+.step-desc{font-size:14px;color:var(--muted);line-height:1.7}
+.step-arrow{position:absolute;right:-1px;top:50%;transform:translateY(-50%);width:30px;height:30px;background:var(--red);display:flex;align-items:center;justify-content:center;color:#fff;font-size:12px;z-index:2}
+.how-step:last-child .step-arrow{display:none}
+
+/* ── FEATURES ── */
+.features-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:1px;background:var(--border);border-radius:20px;overflow:hidden;margin-top:72px}
+.feat{background:var(--black);padding:52px 44px;transition:background .3s}
+.feat:hover{background:var(--card)}
+.feat-badge{display:inline-block;background:rgba(255,45,45,.08);border:1px solid rgba(255,45,45,.18);color:var(--red);font-size:10px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;padding:5px 12px;border-radius:100px;margin-bottom:20px}
+.feat-icon{font-size:36px;margin-bottom:20px;display:block}
+.feat-title{font-size:22px;font-weight:800;color:var(--white);margin-bottom:12px}
+.feat-desc{font-size:14px;color:var(--muted);line-height:1.75}
+
+/* ── HYROX ── */
+.hyrox-wrap{background:linear-gradient(180deg,var(--black) 0%,#0d0404 50%,var(--black) 100%);border-top:1px solid var(--border);border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.hyrox-bg-text{position:absolute;bottom:-40px;left:50%;transform:translateX(-50%);font-family:'Bebas Neue',sans-serif;font-size:280px;color:var(--red);opacity:.03;white-space:nowrap;pointer-events:none}
+.hyrox-inner{max-width:1200px;margin:0 auto;padding:120px 48px;display:grid;grid-template-columns:1fr 1fr;gap:100px;align-items:center;position:relative;z-index:1}
+.hyrox-badge{display:inline-flex;align-items:center;gap:8px;background:rgba(255,45,45,.08);border:1px solid rgba(255,45,45,.2);border-radius:100px;padding:6px 16px;font-size:10px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:28px}
+.hyrox-stats{display:flex;gap:32px;margin-top:40px;flex-wrap:wrap}
+.hyrox-stat-num{font-family:'Bebas Neue',sans-serif;font-size:44px;color:var(--red);line-height:1}
+.hyrox-stat-label{font-size:11px;color:var(--muted);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.stations-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.station{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:16px 18px;display:flex;align-items:center;gap:14px;transition:border-color .2s}
+.station:hover{border-color:rgba(255,45,45,.3)}
+.station-badge{background:var(--red);color:#fff;font-size:10px;font-weight:900;width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.station-name{font-size:13px;font-weight:700;color:var(--white)}
+.station-dist{font-size:11px;color:var(--muted);margin-top:2px}
+
+/* ── LEADERBOARD ── */
+.lb-section{padding:120px 48px;max-width:1200px;margin:0 auto}
+.lb-preview{background:var(--card);border:1px solid var(--border);border-radius:20px;overflow:hidden;margin-top:72px}
+.lb-header{background:var(--card2);padding:20px 28px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.lb-title{font-size:14px;font-weight:700;color:var(--white)}
+.lb-pill{background:rgba(255,45,45,.1);border:1px solid rgba(255,45,45,.2);color:var(--red);font-size:10px;font-weight:700;padding:3px 10px;border-radius:100px;letter-spacing:1px}
+.lb-row{display:flex;align-items:center;padding:18px 28px;border-bottom:1px solid var(--border);gap:16px;transition:background .2s}
+.lb-row:hover{background:var(--card2)}
+.lb-row:last-child{border-bottom:none}
+.lb-row.me{background:rgba(255,45,45,.04);border-left:2px solid var(--red)}
+.lb-rank{font-family:'Bebas Neue',sans-serif;font-size:20px;width:40px;text-align:center}
+.lb-rank.gold{color:#fbbf24}
+.lb-rank.silver{color:#94a3b8}
+.lb-rank.bronze{color:#b45309}
+.lb-rank.normal{color:var(--muted)}
+.lb-name{flex:1;font-size:14px;font-weight:700;color:var(--white)}
+.lb-box{font-size:12px;color:var(--muted);font-weight:400}
+.lb-score{font-family:'Bebas Neue',sans-serif;font-size:22px;color:var(--red)}
+.lb-verified{font-size:10px;color:#4ade80;background:rgba(74,222,128,.1);border:1px solid rgba(74,222,128,.2);padding:2px 8px;border-radius:100px}
+
+/* ── PRICING ── */
+.pricing-wrap{background:var(--card);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.pricing-inner{max-width:900px;margin:0 auto;padding:120px 48px;text-align:center}
+.pricing-cards{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:64px;text-align:left}
+.price-card{background:var(--black);border:1px solid var(--border);border-radius:20px;padding:44px 40px;transition:border-color .3s}
+.price-card:hover{border-color:var(--red)}
+.price-card.featured{border-color:var(--red);background:linear-gradient(135deg,rgba(255,45,45,.05) 0%,var(--black) 100%)}
+.price-tag{font-size:11px;font-weight:700;color:var(--red);letter-spacing:3px;text-transform:uppercase;margin-bottom:24px}
+.price-amount{font-family:'Bebas Neue',sans-serif;font-size:64px;color:var(--white);line-height:1}
+.price-period{font-size:14px;color:var(--muted);margin-bottom:28px}
+.price-features{list-style:none;display:flex;flex-direction:column;gap:12px;margin-bottom:36px}
+.price-features li{font-size:14px;color:var(--muted);display:flex;align-items:center;gap:10px}
+.price-features li::before{content:'✓';color:var(--red);font-weight:800;flex-shrink:0}
+.price-btn{display:block;text-align:center;padding:14px;border-radius:100px;font-size:14px;font-weight:700;text-decoration:none;transition:opacity .2s}
+.price-btn.primary{background:var(--red);color:#fff}
+.price-btn.primary:hover{opacity:.85}
+.price-btn.ghost{border:1px solid var(--border);color:var(--text)}
+.price-btn.ghost:hover{border-color:var(--muted)}
+
+/* ── CTA FINAL ── */
+.final-cta{text-align:center;padding:160px 48px;position:relative;overflow:hidden}
+.final-cta-glow{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:500px;background:radial-gradient(ellipse,rgba(255,45,45,.08) 0%,transparent 70%);pointer-events:none}
+.final-cta-inner{position:relative;z-index:1}
+.final-h2{font-family:'Bebas Neue',sans-serif;font-size:clamp(60px,10vw,130px);color:var(--white);line-height:.9;margin-bottom:24px}
+.final-h2 em{color:var(--red);font-style:normal}
+.final-sub{font-size:18px;color:var(--muted);margin-bottom:52px;line-height:1.6}
+.app-store-btn{display:inline-flex;align-items:center;gap:16px;background:var(--white);color:var(--black);padding:18px 36px;border-radius:16px;text-decoration:none;transition:opacity .2s,transform .2s;font-weight:700}
+.app-store-btn:hover{opacity:.9;transform:translateY(-2px)}
+.app-store-btn svg{width:32px;height:32px}
+.app-store-text{text-align:left}
+.app-store-sub{font-size:11px;color:#666;font-weight:400;display:block}
+.app-store-main{font-size:18px;font-weight:800;display:block;margin-top:2px}
+
+/* ── FOOTER ── */
+footer{border-top:1px solid var(--border);padding:52px 48px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;gap:32px}
+.footer-logo{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:3px;color:var(--white)}
+.footer-logo em{color:var(--red);font-style:normal}
+.footer-links{display:flex;gap:28px;justify-content:center}
+.footer-links a{color:var(--muted);text-decoration:none;font-size:13px;transition:color .2s}
+.footer-links a:hover{color:var(--white)}
+.footer-copy{text-align:right;color:var(--muted);font-size:12px;line-height:1.6}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:0 20px}
+  .nav-center{display:none}
+  .section,.lb-section{padding:80px 24px}
+  .how-inner,.hyrox-inner,.pricing-inner,.final-cta{padding:80px 24px}
+  .how-steps{grid-template-columns:1fr}
+  .step-arrow{display:none}
+  .features-grid{grid-template-columns:1fr}
+  .hyrox-inner{grid-template-columns:1fr;gap:48px}
+  .pricing-cards{grid-template-columns:1fr}
+  footer{grid-template-columns:1fr;text-align:center}
+  .footer-copy{text-align:center}
+  .footer-links{flex-wrap:wrap}
+}
 </style>
 </head>
 <body>
 
 <!-- NAV -->
 <nav>
-  <div class="nav-logo">WOD<span>SCAN</span></div>
-  <ul class="nav-links">
-    <li><a href="#features">Fonctionnalites</a></li>
-    <li><a href="#how">Comment ca marche</a></li>
-    <li><a href="#pricing">Tarifs</a></li>
-    <li><a href="#privacy">Confidentialite</a></li>
-    <li><a href="#download" class="nav-cta">Telecharger</a></li>
-  </ul>
+  <a href="#" class="nav-logo">WOD<em>SCAN</em></a>
+  <div class="nav-center">
+    <a href="#how">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#hyrox">Hyrox</a>
+    <a href="#pricing">Pricing</a>
+  </div>
+  <div class="nav-right">
+    <a href="https://www.instagram.com/wodscan" class="nav-pill">@wodscan</a>
+    <a href="#download" class="nav-btn">Get the app</a>
+  </div>
 </nav>
 
 <!-- HERO -->
 <section class="hero">
-  <div class="hero-bg"></div>
-  <div class="hero-content">
-    <div>
-      <div class="hero-tag">Disponible sur iOS</div>
-      <h1 class="hero-title">
-        WOD<br><span class="red">SCAN</span>
-      </h1>
-      <p class="hero-subtitle">CrossFit · Hyrox · Partage & Performance</p>
-      <p class="hero-desc">
-        Scannez votre tableau de WOD, laissez l'IA analyser l'exercice, enregistrez vos performances et mesurez-vous aux meilleurs athletes de votre box et du monde entier.
-      </p>
-      <div class="hero-btns">
-        <a href="#download" class="btn-primary">📱 Telecharger gratuitement</a>
-        <a href="#how" class="btn-secondary">Voir comment ca marche</a>
-      </div>
-      <div class="hero-stats">
-        <div class="stat">
-          <div class="stat-number">7<span>j</span></div>
-          <div class="stat-label">Essai gratuit</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number">4</div>
-          <div class="stat-label">Types de WOD</div>
-        </div>
-        <div class="stat">
-          <div class="stat-number"><span>#</span>1</div>
-          <div class="stat-label">Leaderboard live</div>
-        </div>
-      </div>
+  <div class="hero-noise"></div>
+  <div class="hero-glow1"></div>
+  <div class="hero-glow2"></div>
+  <div class="hero-inner">
+    <div class="hero-eyebrow"><span class="hero-eyebrow-dot"></span>Launching July 1st, 2026</div>
+    <h1 class="hero-h1">
+      SCAN<br>
+      <span class="red">TRACK</span><br>
+      <span class="outline">DOMINATE</span>
+    </h1>
+    <p class="hero-p">Point your iPhone at the WOD board.<br><strong>AI reads everything instantly.</strong><br>Log your result. Compete. Build your legacy.</p>
+    <div class="hero-ctas">
+      <a href="#download" class="cta-main">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+        Download on App Store
+      </a>
+      <a href="#how" class="cta-ghost">See how it works →</a>
     </div>
-
-    <div class="hero-phone">
-      <div class="phone-glow"></div>
-      <div class="phone-frame">
-        <div class="phone-notch"></div>
-        <div class="phone-screen">
-          <div class="phone-header">Scanner ton <span>WOD</span></div>
-          <div class="phone-scan-btn">📷 Prendre une photo</div>
-          <div class="phone-card">
-            <div class="phone-type">Type detecte</div>
-            <div style="font-family:'Barlow Condensed',sans-serif;font-weight:800;color:#FF6B35;font-size:16px;margin-bottom:8px;">AMRAP</div>
-            <div style="font-size:11px;color:#555;line-height:1.5;">21-15-9<br>Thrusters 43kg<br>Pull-ups</div>
-          </div>
-          <div class="phone-card">
-            <div class="phone-type">Ma performance</div>
-            <div class="phone-result">5 rds + 12</div>
-          </div>
-          <div class="phone-card" style="display:flex;justify-content:space-between;align-items:center;">
-            <div>
-              <div class="phone-type">Classement box</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#FF2D2D;">#3</div>
-            </div>
-            <div>
-              <div class="phone-type">Mondial</div>
-              <div style="font-family:'Bebas Neue',sans-serif;font-size:22px;color:#888;">#247</div>
-            </div>
-          </div>
-        </div>
-        <div class="phone-tabbar">
-          <div class="tab-icon active">📷</div>
-          <div class="tab-icon">⚡</div>
-          <div class="tab-icon">🏆</div>
-          <div class="tab-icon">📈</div>
-          <div class="tab-icon">🏅</div>
-        </div>
-      </div>
+    <div class="hero-meta">
+      <div class="hero-meta-item"><div class="hero-meta-num">3s</div><div class="hero-meta-label">To scan a WOD</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-num">AI</div><div class="hero-meta-label">Powered by Claude</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-num">7</div><div class="hero-meta-label">Day free trial</div></div>
+      <div class="hero-meta-item"><div class="hero-meta-num">∞</div><div class="hero-meta-label">WODs tracked</div></div>
     </div>
   </div>
 </section>
+
+<!-- TICKER -->
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">CrossFit <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Hyrox <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">AI Scanner <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Leaderboard <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Personal Records <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Community <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Video Proof <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">AMRAP <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">For Time <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">EMOM <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Strength <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">CrossFit <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Hyrox <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">AI Scanner <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Leaderboard <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Personal Records <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Community <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Video Proof <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">AMRAP <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">For Time <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">EMOM <span class="ticker-sep">●</span></span>
+    <span class="ticker-item">Strength <span class="ticker-sep">●</span></span>
+  </div>
+</div>
+
+<!-- HOW IT WORKS -->
+<div class="how-wrap" id="how">
+  <div class="how-inner">
+    <p class="eyebrow">How it works</p>
+    <h2 class="big-title">THREE STEPS.<br><em>ZERO EFFORT.</em></h2>
+    <p class="body-text">No more typing your WOD manually. No more forgotten PRs. WodScan does the work so you can focus on training.</p>
+    <div class="how-steps">
+      <div class="how-step">
+        <div class="step-n">01</div>
+        <div class="step-icon-wrap">📸</div>
+        <div class="step-title">Photograph the board</div>
+        <p class="step-desc">Walk in, take a photo of the whiteboard. That's literally it. One tap, no typing, no squinting at your notes later.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="how-step">
+        <div class="step-n">02</div>
+        <div class="step-icon-wrap">🤖</div>
+        <div class="step-title">AI reads everything</div>
+        <p class="step-desc">Claude AI extracts the WOD — type, movements, loads, rounds — and ignores the warm-up and skill sections automatically.</p>
+        <div class="step-arrow">→</div>
+      </div>
+      <div class="how-step">
+        <div class="step-n">03</div>
+        <div class="step-icon-wrap">🏆</div>
+        <div class="step-title">Log, rank, repeat</div>
+        <p class="step-desc">Enter your time or score in one tap. Your result is saved, ranked on the leaderboard, and compared to your history.</p>
+      </div>
+    </div>
+  </div>
+</div>
 
 <!-- FEATURES -->
 <section class="section" id="features">
-  <div class="section-tag">Fonctionnalites</div>
-  <h2 class="section-title">Tout ce dont tu as<br><span>besoin</span></h2>
-  <p class="section-desc">WodScan centralise tout votre suivi sportif en une seule application intelligente.</p>
-
+  <p class="eyebrow">Features</p>
+  <h2 class="big-title">BUILT FOR ATHLETES<br>WHO ARE <em>SERIOUS.</em></h2>
   <div class="features-grid">
-    <div class="feature-card fade-in">
-      <span class="feature-icon">📷</span>
-      <div class="feature-title">Scan IA</div>
-      <p class="feature-desc">Photographiez votre tableau de WOD ecrit a la main. Notre IA Claude extrait et structure automatiquement l'exercice en quelques secondes.</p>
+    <div class="feat">
+      <div class="feat-badge">AI · Claude</div>
+      <span class="feat-icon">🧠</span>
+      <div class="feat-title">AI WOD Scanner</div>
+      <p class="feat-desc">Powered by Anthropic's Claude — the most capable AI available. Reads AMRAP, For Time, EMOM, Strength, and Hyrox from any whiteboard, handwritten or printed.</p>
     </div>
-    <div class="feature-card fade-in">
-      <span class="feature-icon">⚡</span>
-      <div class="feature-title">Performance</div>
-      <p class="feature-desc">Enregistrez vos resultats selon le type de WOD — temps, rounds, poids, distance. Les champs s'adaptent automatiquement.</p>
+    <div class="feat">
+      <div class="feat-badge">Community</div>
+      <span class="feat-icon">🌍</span>
+      <div class="feat-title">Global Leaderboard</div>
+      <p class="feat-desc">Compete with athletes from every box worldwide. Filter by WOD, workout type, or your own box. Top 3 scores require video proof — integrity is non-negotiable.</p>
     </div>
-    <div class="feature-card fade-in">
-      <span class="feature-icon">🏆</span>
-      <div class="feature-title">Records</div>
-      <p class="feature-desc">Suivez vos records personnels par mouvement. PR de Back Squat, Fran time, distance Row — tout est archive et mis en avant.</p>
+    <div class="feat">
+      <div class="feat-badge">Performance</div>
+      <span class="feat-icon">📊</span>
+      <div class="feat-title">Personal Records</div>
+      <p class="feat-desc">Every new PR is automatically flagged and highlighted. Your full training history, searchable by WOD name, type, or date. Your memory for CrossFit.</p>
     </div>
-    <div class="feature-card fade-in">
-      <span class="feature-icon">📈</span>
-      <div class="feature-title">Statistiques</div>
-      <p class="feature-desc">Visualisez votre progression avec des graphiques de repartition par type de WOD, activite hebdomadaire et evolution dans le temps.</p>
-    </div>
-    <div class="feature-card fade-in">
-      <span class="feature-icon">🏅</span>
-      <div class="feature-title">Leaderboard</div>
-      <p class="feature-desc">Comparez vos performances avec les athletes du monde entier ou uniquement de votre box. Filtrez par type de WOD, age et sexe.</p>
-    </div>
-    <div class="feature-card fade-in">
-      <span class="feature-icon">📋</span>
-      <div class="feature-title">Historique</div>
-      <p class="feature-desc">Retrouvez tous vos WODs passes avec recherche par mots-cles. Une memoire complete de votre progression sportive.</p>
+    <div class="feat">
+      <div class="feat-badge">Insights</div>
+      <span class="feat-icon">📈</span>
+      <div class="feat-title">Performance Stats</div>
+      <p class="feat-desc">Weekly training volume, workout type distribution, strength progression charts. See the patterns in your training that you'd never notice otherwise.</p>
     </div>
   </div>
 </section>
 
-<!-- HOW IT WORKS -->
-<section class="how-section" id="how">
-  <div style="max-width:1200px;margin:0 auto;">
-    <div class="section-tag" style="text-align:center;">Comment ca marche</div>
-    <h2 class="section-title" style="text-align:center;">Simple comme<br><span>1, 2, 3, 4</span></h2>
-  </div>
-  <div class="steps">
-    <div class="step fade-in">
-      <div class="step-number">1</div>
-      <div class="step-title">Photographiez</div>
-      <p class="step-desc">Prenez en photo le tableau de votre WOD du jour ecrit a la main dans votre box.</p>
+<!-- LEADERBOARD PREVIEW -->
+<section class="lb-section">
+  <p class="eyebrow">Leaderboard</p>
+  <h2 class="big-title">WHO'S #1<br>IN YOUR <em>BOX?</em></h2>
+  <div class="lb-preview">
+    <div class="lb-header">
+      <div class="lb-title">Fran — For Time</div>
+      <div class="lb-pill">WORLD</div>
     </div>
-    <div class="step fade-in">
-      <div class="step-number">2</div>
-      <div class="step-title">L'IA analyse</div>
-      <p class="step-desc">Claude AI detecte le type (AMRAP, For Time, EMOM, Strength) et structure les mouvements.</p>
+    <div class="lb-row">
+      <div class="lb-rank gold">🥇</div>
+      <div><div class="lb-name">Lucas Renard</div><div class="lb-box">CrossFit Montpellier</div></div>
+      <div class="lb-verified">✓ Verified</div>
+      <div class="lb-score">3:52</div>
     </div>
-    <div class="step fade-in">
-      <div class="step-number">3</div>
-      <div class="step-title">Performez</div>
-      <p class="step-desc">Faites votre WOD, revenez dans l'app et entrez votre resultat en 2 touches.</p>
+    <div class="lb-row">
+      <div class="lb-rank silver">🥈</div>
+      <div><div class="lb-name">Sara Martin</div><div class="lb-box">CrossFit Lyon</div></div>
+      <div class="lb-verified">✓ Verified</div>
+      <div class="lb-score">4:18</div>
     </div>
-    <div class="step fade-in">
-      <div class="step-number">4</div>
-      <div class="step-title">Comparez</div>
-      <p class="step-desc">Consultez votre classement dans votre box et dans le leaderboard mondial en temps reel.</p>
+    <div class="lb-row">
+      <div class="lb-rank bronze">🥉</div>
+      <div><div class="lb-name">Marc Dupont</div><div class="lb-box">CrossFit Paris 11</div></div>
+      <div class="lb-verified">✓ Verified</div>
+      <div class="lb-score">4:45</div>
+    </div>
+    <div class="lb-row">
+      <div class="lb-rank normal">#4</div>
+      <div><div class="lb-name">Julie Kowalski</div><div class="lb-box">CrossFit Bordeaux</div></div>
+      <div></div>
+      <div class="lb-score">5:01</div>
+    </div>
+    <div class="lb-row me">
+      <div class="lb-rank normal">#12</div>
+      <div><div class="lb-name">You 👋</div><div class="lb-box">Your box</div></div>
+      <div></div>
+      <div class="lb-score" style="color:var(--muted)">?:??</div>
     </div>
   </div>
 </section>
+
+<!-- HYROX -->
+<div class="hyrox-wrap" id="hyrox">
+  <div class="hyrox-bg-text">HYROX</div>
+  <div class="hyrox-inner">
+    <div>
+      <div class="hyrox-badge">🔥 Hyrox Ready</div>
+      <h2 class="big-title" style="font-size:clamp(48px,6vw,80px)">THE ONLY APP<br>BUILT FOR<br><em>HYROX.</em></h2>
+      <p class="body-text">All 8 official stations, in competition order. Open and Pro loads for men and women. Track your split times, total time, and compete on a dedicated Hyrox leaderboard.</p>
+      <div class="hyrox-stats">
+        <div><div class="hyrox-stat-num">8km</div><div class="hyrox-stat-label">Running</div></div>
+        <div><div class="hyrox-stat-num">8</div><div class="hyrox-stat-label">Stations</div></div>
+        <div><div class="hyrox-stat-num">2</div><div class="hyrox-stat-label">Categories</div></div>
+      </div>
+    </div>
+    <div class="stations-grid">
+      <div class="station"><div class="station-badge">01</div><div><div class="station-name">SkiErg</div><div class="station-dist">1 000m</div></div></div>
+      <div class="station"><div class="station-badge">02</div><div><div class="station-name">Sled Push</div><div class="station-dist">50m</div></div></div>
+      <div class="station"><div class="station-badge">03</div><div><div class="station-name">Sled Pull</div><div class="station-dist">50m</div></div></div>
+      <div class="station"><div class="station-badge">04</div><div><div class="station-name">Burpee Jumps</div><div class="station-dist">80m</div></div></div>
+      <div class="station"><div class="station-badge">05</div><div><div class="station-name">Rowing</div><div class="station-dist">1 000m</div></div></div>
+      <div class="station"><div class="station-badge">06</div><div><div class="station-name">Farmers Carry</div><div class="station-dist">200m</div></div></div>
+      <div class="station"><div class="station-badge">07</div><div><div class="station-name">Sandbag Lunges</div><div class="station-dist">100m</div></div></div>
+      <div class="station"><div class="station-badge">08</div><div><div class="station-name">Wall Balls</div><div class="station-dist">100 reps</div></div></div>
+    </div>
+  </div>
+</div>
 
 <!-- PRICING -->
-<section class="section" id="pricing" style="text-align:center;">
-  <div class="section-tag">Tarifs</div>
-  <h2 class="section-title">Simple et<br><span>transparent</span></h2>
-  <p class="section-desc" style="margin:0 auto 60px;">7 jours d'essai gratuit, sans engagement. Acces complet a toutes les fonctionnalites.</p>
-
-  <div class="pricing-grid">
-    <div class="price-card">
-      <div class="price-name">Mensuel</div>
-      <div class="price-amount">5<span>€</span></div>
-      <div class="price-period">par mois</div>
-      <div class="price-trial">7 jours gratuits</div>
-      <a href="#download" class="price-cta outline">Commencer</a>
-    </div>
-    <div class="price-card featured">
-      <div class="price-badge">Meilleur choix</div>
-      <div class="price-name">Annuel</div>
-      <div class="price-amount">39<span>,99€</span></div>
-      <div class="price-period">par an</div>
-      <div class="price-saving">Economisez 33%</div>
-      <a href="#download" class="price-cta">Commencer</a>
-    </div>
-  </div>
-  <p class="pricing-note">Sans engagement · Annulable a tout moment · Renouvellement automatique</p>
-</section>
-
-<!-- COMMUNITY -->
-<section class="community-section">
-  <h2 class="community-title">Rejoignez la communaute</h2>
-  <p class="community-desc">Des athletes CrossFit et Hyrox du monde entier utilisent WodScan pour suivre leurs performances et se challenger mutuellement.</p>
-  <div class="community-stats">
-    <div>
-      <div class="community-stat-number">∞</div>
-      <div class="community-stat-label">WODs scannes</div>
-    </div>
-    <div>
-      <div class="community-stat-number">2</div>
-      <div class="community-stat-label">Disciplines</div>
-    </div>
-    <div>
-      <div class="community-stat-number">1er</div>
-      <div class="community-stat-label">Juillet 2026</div>
+<div class="pricing-wrap" id="pricing">
+  <div class="pricing-inner">
+    <p class="eyebrow" style="text-align:center">Pricing</p>
+    <h2 class="big-title" style="text-align:center;font-size:clamp(48px,7vw,80px)">START FREE.<br><em>STAY FOREVER.</em></h2>
+    <p class="body-text" style="margin:0 auto;text-align:center">7 days free. No credit card required. Cancel anytime.</p>
+    <div class="pricing-cards">
+      <div class="price-card">
+        <div class="price-tag">Monthly</div>
+        <div class="price-amount">€4.99</div>
+        <div class="price-period">per month</div>
+        <ul class="price-features">
+          <li>Unlimited WOD scans</li>
+          <li>Full leaderboard access</li>
+          <li>Personal records & stats</li>
+          <li>Hyrox tracker</li>
+          <li>7-day free trial</li>
+        </ul>
+        <a href="https://bit.ly/telechargewodscan" class="price-btn ghost">Start free trial</a>
+      </div>
+      <div class="price-card featured">
+        <div class="price-tag">Annual · Best value</div>
+        <div class="price-amount">€39.99</div>
+        <div class="price-period">per year — save 33%</div>
+        <ul class="price-features">
+          <li>Everything in Monthly</li>
+          <li>33% cheaper</li>
+          <li>Priority support</li>
+          <li>Early access to new features</li>
+          <li>7-day free trial</li>
+        </ul>
+        <a href="https://bit.ly/telechargewodscan" class="price-btn primary">Start free trial</a>
+      </div>
     </div>
   </div>
-  <a href="#download" class="btn-white">Telecharger WodScan</a>
-</section>
+</div>
 
-<!-- DOWNLOAD -->
-<section class="section" id="download" style="text-align:center;">
-  <div class="section-tag">Disponible sur</div>
-  <h2 class="section-title">Disponible sur<br><span>App Store</span></h2>
-  <p class="section-desc" style="margin:0 auto 40px;">Telechargez WodScan gratuitement et commencez votre essai de 7 jours.</p>
-  <a href="#" class="btn-primary" style="font-size:18px;padding:20px 48px;">🍎 Disponible sur l'App Store</a>
-  <p style="margin-top:16px;font-size:13px;color:var(--muted);">iOS 16 et superieur · Gratuit · Abonnement Premium disponible</p>
-</section>
+<!-- FINAL CTA -->
+<div class="final-cta" id="download">
+  <div class="final-cta-glow"></div>
+  <div class="final-cta-inner">
+    <p class="eyebrow" style="margin-bottom:24px">Ready to compete?</p>
+    <h2 class="final-h2">YOUR RECORD.<br>YOUR BOX.<br><em>YOUR COMMUNITY.</em></h2>
+    <p class="final-sub">Available July 1st, 2026 · iOS · 7-day free trial</p>
+    <a href="https://bit.ly/telechargewodscan" class="app-store-btn">
+      <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+      <div class="app-store-text">
+        <span class="app-store-sub">Download on the</span>
+        <span class="app-store-main">App Store</span>
+      </div>
+    </a>
+  </div>
+</div>
 
 <!-- FOOTER -->
 <footer>
-  <div class="footer-grid">
-    <div>
-      <div class="footer-logo">WOD<span>SCAN</span></div>
-      <p class="footer-desc">L'application de suivi de performances pour les athletes CrossFit et Hyrox. Scannez, enregistrez, comparez.</p>
-      <div class="footer-disciplines">
-        <span class="discipline-tag">CrossFit</span>
-        <span class="discipline-tag">Hyrox</span>
-      </div>
-    </div>
-    <div>
-      <div class="footer-col-title">Application</div>
-      <ul class="footer-links">
-        <li><a href="#features">Fonctionnalites</a></li>
-        <li><a href="#how">Comment ca marche</a></li>
-        <li><a href="#pricing">Tarifs</a></li>
-        <li><a href="#download">Telecharger</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Legal</div>
-      <ul class="footer-links">
-        <li><a href="#privacy">Politique de confidentialite</a></li>
-        <li><a href="#">CGU</a></li>
-        <li><a href="#">Mentions legales</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Contact</div>
-      <ul class="footer-links">
-        <li><a href="mailto:thomas.nobels@anteclim.fr">thomas.nobels@anteclim.fr</a></li>
-      </ul>
-    </div>
+  <div class="footer-logo">WOD<em>SCAN</em></div>
+  <div class="footer-links">
+    <a href="https://nobelsth.github.io/WOD-SCAN-/privacy.html">Privacy</a>
+    <a href="https://www.instagram.com/wodscan">Instagram</a>
+    <a href="mailto:nobels.th@gmail.com">Contact</a>
   </div>
-  <div class="footer-bottom">
-    <span>© 2026 WodScan — Thomas Nobels. Tous droits reserves.</span>
-    <span>CROSSFIT · HYROX · PARTAGE & PERFORMANCE</span>
-  </div>
+  <div class="footer-copy">© 2026 WodScan<br>CrossFit & Hyrox Performance Tracker</div>
 </footer>
-
-<script>
-  // Fade in on scroll
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry, i) => {
-      if (entry.isIntersecting) {
-        setTimeout(() => entry.target.classList.add('visible'), i * 100);
-      }
-    });
-  }, { threshold: 0.1 });
-
-  document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
-</script>
 
 </body>
 </html>
